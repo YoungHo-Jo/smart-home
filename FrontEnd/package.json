@@ -1,0 +1,25 @@
+{
+  "name": "untitled",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "cors": "^2.8.4",
+    "moment": "^2.22.2",
+    "mysql": "^2.16.0",
+    "react": "^16.4.2",
+    "react-bar-chart": "^0.1.2",
+    "react-calendar": "^2.16.1",
+    "react-dom": "^16.4.2",
+    "react-request": "^3.1.2",
+    "react-router": "^4.3.1",
+    "react-router-dom": "^4.3.1",
+    "react-scripts": "1.1.4",
+    "superagent": "^3.8.3"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test --env=jsdom",
+    "eject": "react-scripts eject"
+  }
+}

@@ -1,0 +1,121 @@
+
+*{
+  box-sizing: border-box;
+}
+
+.header{
+  left:25%;
+  width: 75%;
+  padding: 5%;
+  color: white;
+  background-color: darkolivegreen;
+  top:0;
+  position: -webkit-sticky;
+  position: sticky;
+}
+
+.menu{
+  width:25%;
+  float:left;
+  height: 100%;
+  position: fixed;
+  top: 0;
+}
+
+.menu h1{
+  width:100%;
+  margin-top: 0;
+  padding: 5%;
+  text-align: center;
+  color:white;
+  font-size:100%;
+  background-color: black;
+}
+
+.sidenav {
+  list-style-type: none;
+  background-color: #202020;
+  height: 100%;
+}
+
+.sidenav a {
+  display: block;
+  color: #FFFFFF;
+  padding: 8px 16px;
+  text-decoration: none;
+}
+
+.sidenav a.activate {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.sidenav a:hover:not(.activate){
+  background-color:gray;
+  color:white;
+}
+
+.main{
+  position: relative;
+  left: 25%;
+  width: 75%;
+  top: 15%;
+  margin-bottom: 100%;
+  background-color:whitesmoke;
+  padding: 5%;
+  overflow: auto;
+}
+
+.date-btn-group .button{
+  background-color: red;
+  border: 1px solid black;
+  color: white;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  cursor: pointer;
+  float: left;
+  margin-left: auto;
+  margin-right: auto;
+  width:25%;
+}
+
+.date-btn-group .button:not(:last-child){
+  border-right: none;
+}
+
+.date-btn-group .button:hover{
+  background-color: darkred;
+}
+
+
+.cal {
+}
+
+.cal button{
+  position: relative;
+  margin :auto;
+}
+
+.main .cal-graph-left{
+  float:left;
+  margin: 0 auto;
+  width: 49%;
+}
+
+.main .cal-graph-right{
+  float: right;
+  margin: 0 auto;
+  width: 49%;
+}
+
+.button-center{
+  text-align:center;
+  width:50%;
+  background-color: #10a3a3;
+  color: white;
+  border-radius: 20%;
+  height: 25%;
+}
