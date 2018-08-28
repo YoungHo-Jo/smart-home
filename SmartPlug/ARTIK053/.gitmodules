@@ -1,0 +1,11 @@
+[submodule "iotjs"]
+  path = iotjs/
+  url = https://github.com/YoungHo-Jo/iotjs.git
+
+[submodule "TizenRT"]
+  path = TizenRT/
+  url = https://github.com/YoungHo-Jo/TizenRT.git
+
+[submodule "kconfig"]
+  path = kconfig/
+  url = https://bitbucket.org/nuttx/tools.git
