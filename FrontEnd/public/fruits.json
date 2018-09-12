@@ -1,0 +1,10 @@
+[{"obj_id":1,"start_time":"08:59:59","end_time":"23:59:59"},
+    {"obj_id":2,"start_time":"08:00:00","end_time":"10:00:00"},
+    {"obj_id":2,"start_time":"18:30:00","end_time":"23:59:59"},
+    {"obj_id":3,"start_time":"00:00:00","end_time":"23:59:59"},
+    {"obj_id":4,"start_time":"19:00:00","end_time":"20:00:00"},
+    {"obj_id":5,"start_time":"08:10:00","end_time":"08:05:00"},
+    {"obj_id":6,"start_time":"00:00:00","end_time":"00:00:00"},
+    {"obj_id":7,"start_time":"19:00:00","end_time":"20:00:00"},
+    {"obj_id":8,"start_time":"19:00:00","end_time":"23:59:00"},
+    {"obj_id":9,"start_time":"08:20:00","end_time":"08:25:00"}]
