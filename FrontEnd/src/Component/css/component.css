@@ -1,0 +1,17 @@
+
+.all_container{
+    width: 90%;
+}
+
+.schedule_container {
+    border-radius: 80%;
+    border : 3px solid black;
+    width: 50%;
+}
+
+.schedule_container .button{
+    text-align:center;
+    background-color: #0e8c8c;
+}
+
+

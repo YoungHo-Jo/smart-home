@@ -1,29 +1,30 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import './index.css';
+import './css/index.css';
 import {BrowserRouter as Router, Route} from 'react-router-dom'
 import 'semantic-ui-css/semantic.min.css';
 
 
-import Monitoring from "./Monitoring";
+import Monitoring from "./Component/Monitoring";
 import App from "./App"
-import ObjTime from "./Obj_Time";
-import EditForm from "./EditForm";
-import Consumption from "./Consumption"
-import calendar from "./calendar"
-
-
+import ObjTime from "./Component/Obj_Time";
+import EditForm from "./Component/EditForm";
+import checkpage from "./checkpage";
+import Home from "./Home"
+import schedule from './Component/schedule'
 
 
 ReactDOM.render(
     <Router>
         <div>
             <Route path="/" component={App}/>
+            <Route path="/Home" component={Home}/>
             <Route path="/EditForm/:obj_id" component={EditForm}/>
             <Route path="/ObjTime" component={ObjTime} />
             <Route path="/Monitoring" component={Monitoring}/>
-            <Route path="/Consumption" component={Consumption}/>
-            <Route path="/calendar" component={calendar}/>
+            <Route path="/checkpage" component={checkpage}/>
+            <Route path="/schedule" component={schedule}/>
+
         </div>
     </Router>,
     document.getElementById('root')
