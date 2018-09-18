@@ -7,8 +7,6 @@ var ble = require('./ble')
 
 var wdt = require('./wdt');
 
-var usecomport = '';
-var usebaudrate = '';
 var useparentport = '';
 var useparenthostname = '';
 
@@ -34,8 +32,6 @@ fs.readFile('conf.xml', 'utf-8', function (err, data) {
 				var jsonString = JSON.stringify(result);
 				conf = JSON.parse(jsonString)['m2m:conf'];
 
-				usecomport = conf.tas.comport;
-				usebaudrate = conf.tas.baudrate;
 				useparenthostname = conf.tas.parenthostname;
 				useparentport = conf.tas.parentport;
 
@@ -88,42 +84,9 @@ function timer_upload_action() {
 			}
 		})
 		
-		// for (var i = 0; i < upload_arr.length; i++) {
-		// 	if (upload_arr[i].id == 'timer') {
-		// 		var cin = {
-		// 			ctname: upload_arr[i].ctname,
-		// 			con: con
-		// 		};
-		// 		console.log(JSON.stringify(cin) + ' ---->');
-		// 		upload_client.write(JSON.stringify(cin) + '<EOF>');
-		// 		break;
-		// 	}
-		// }
 	}
 }
 
-function upload_action() {
-	if (tas_state == 'upload') {
-		console.log('upload data')
-
-		upload_arr.some((e, idx) => {
-			if(e.id == 'cnt-co2') {
-				var cin = {
-					ctnam: e.ctnam,
-					con: {
-						RSSIs: ble.RSSIs,
-					}
-				}
-
-				console.log(`${JSON.stringify(cin)} ----> `)
-				upload_client.write(JSON.stringify(cin) + '<EOF>')
-				return true
-			} else {
-				return false
-			}
-		})
-	}
-}
 
 var tas_download_count = 0;
 
@@ -143,26 +106,17 @@ function on_receive(data) {
 						console.log('Received: ' + line);
 
 						if (++tas_download_count >= download_arr.length) {
-							console.log('++tas_download_count >= download_arr.length')
 							tas_state = 'upload';
 						}
 					} else {
-						upload_arr.some((e, idx) => {
-							if(e.ctname == sink_obj.ctname) {
-								console(`ACK : ${line} <----`)
-								return true 
-							} else {
-								return false 
-							}
-						})
-
-
-						// for (var j = 0; j < upload_arr.length; j++) {
-						// 	if (upload_arr[j].ctname == sink_obj.ctname) {
-						// 		console.log('ACK : ' + line + ' <----');
-						// 		break;
+						// upload_arr.some((e, idx) => {
+						// 	if(e.ctname == sink_obj.ctname) {
+						// 		// console.log(`ACK : ${line} <----`)
+						// 		return true 
+						// 	} else {
+						// 		return false 
 						// 	}
-						// }
+						// })
 
 						download_arr.some((e, idx) => {
 							if(e.ctname == sink_obj.ctname) {
@@ -174,24 +128,22 @@ function on_receive(data) {
 
 								// TODO: Write codes of controlling the switch 
 
+								if(sink_obj.con && sink_obj.con.hasOwnProperty('cmd'))  {
+									console.log("========================")
+									for(var key in sink_obj.con) {
+										var value = sink_obj.con.cmd[key]
+										if(value == true || value == false) {
+											ble.setSwitch(key, value)
+										}
+									}
+								}
+
 								return true
 							} else {
 								return false
 							}
 						})
 
-
-						// for (j = 0; j < download_arr.length; j++) {
-						// 	if (download_arr[j].ctname == sink_obj.ctname) {
-						// 		g_down_buf = JSON.stringify({
-						// 			id: download_arr[i].id,
-						// 			con: sink_obj.con
-						// 		});
-						// 		console.log(g_down_buf + ' <----');
-						// 		myPort.write(g_down_buf);
-						// 		break;
-						// 	}
-						// }
 					}
 				}
 			}
@@ -234,7 +186,7 @@ function tas_watchdog() {
 			tas_download_count = 0;
 
 			download_arr.every((e, idx) => {
-				console.log('download Connected - ' + download_arr[i].ctname + ' hello');
+				console.log('download Connected - ' + e.ctname + ' hello');
 				var cin = {
 					ctname: e.ctname,
 					con: 'hello'
@@ -250,104 +202,98 @@ function tas_watchdog() {
 	}
 }
 
-wdt.set_wdt(require('shortid').generate(), 2, timer_upload_action);
-wdt.set_wdt(require('shortid').generate(), 3, tas_watchdog);
-wdt.set_wdt(require('shortid').generate(), 3, upload_action);
-// TODO: Set upload timer of RSSI, Current, Switch state
 
-var cur_c = '';
-var pre_c = '';
-var g_sink_buf = '';
-var g_sink_ready = [];
-var g_sink_buf_start = 0;
-var g_sink_buf_index = 0;
+wdt.set_wdt(require('shortid').generate(), 2, timer_upload_action);
+wdt.set_wdt(require('shortid').generate(), 1, tas_watchdog);
+wdt.set_wdt(require('shortid').generate(), 1, uploadRSSIs);
+wdt.set_wdt(require('shortid').generate(), 1, uploadSwitchState);
+wdt.set_wdt(require('shortid').generate(), 1, uploadAmps);
+wdt.set_wdt(require('shortid').generate(), 10, uploadPlugs);
+
+function uploadPlugs() {
+	if(tas_state === 'upload') {
+		upload_arr.every((e, idx) => {
+			if(e.ctname === 'plug') {
+				var cin = {
+					ctname: e.ctname,
+					con: Object.keys(ble.connectedPeripherals)
+				}
+
+				console.log(`SEND: ${JSON.stringify(cin)} ---->`)
+				upload_client.write(JSON.stringify(cin) + '<EOF>')
+				return false
+			} else {
+				return true
+			}
+		})
+	}
+}
+
+
+function uploadRSSIs() {
+	if(tas_state === 'upload') {
+		upload_arr.every((e, idx) => {
+			if(e.ctname == 'rssi') {
+					var cin = {
+						ctname: e.ctname,
+						con: ble.RSSIs
+					}	
+
+					console.log(`SEND: ${JSON.stringify(cin)} ---->`)
+					upload_client.write(JSON.stringify(cin) + '<EOF>')
+					return false
+			} else {
+					return true
+			}
+		})
+	}
+}
+
+function uploadSwitchState() {
+	if(tas_state == 'upload') {
+		upload_arr.every((e, idx) => {
+			if(e.ctname == 'switch') {
+					var cin = {
+						ctname: e.ctname,
+						con: ble.switchStates
+					}	
+
+					console.log(`SEND: ${JSON.stringify(cin)} ---->`)
+					upload_client.write(JSON.stringify(cin) + '<EOF>')
+					return false
+			} else {
+				return true
+			}
+		})
+	}
+}
+
+function uploadAmps() {
+	// console.log(`Upload Amps ${tas_state}`)
+	if(tas_state == 'upload') {
+		upload_arr.every((e, idx) => {
+			if(e.ctname == 'amps') {
+					var cin = {
+						ctname: e.ctname,
+						con: ble.currentValues
+					}	
+
+					console.log(`SEND: ${JSON.stringify(cin)} ---->`)
+					upload_client.write(JSON.stringify(cin) + '<EOF>')
+					return false
+			} else {
+					return true
+			}
+		})
+	}
+}
 var g_down_buf = '';
 
-function showPortOpen() {
-	console.log('port open. Data rate: ' + myPort.options.baudRate);
-}
-
-var count = 0;
-
-function saveLastestData(data) {
-	var val = data.readUInt16LE(0, true);
-
-	if (g_sink_buf_start == 0) {
-		if (val == 0x16) {
-			count = 1;
-			g_sink_buf_start = 1;
-			g_sink_ready.push(val);
-		}
-	} else if (g_sink_buf_start == 1) {
-		if (val == 0x05) {
-			count = 2;
-			g_sink_buf_start = 2;
-			g_sink_ready.push(val);
-		}
-	} else if (g_sink_buf_start == 2) {
-		if (val == 0x01) {
-			count = 3;
-			g_sink_buf_start = 3;
-			g_sink_ready.push(val);
-		}
-	} else if (g_sink_buf_start == 3) {
-		count++;
-		g_sink_ready.push(val);
-
-		if (count >= 9) {
-			console.log(g_sink_ready);
-
-			/*CO2 통신 예제
-			SEND(4바이트) : 0x11, 0x01, 0x01, 0xED
-			Respond(8바이트) : 0x16, 0x05, 0x01, 0x02, 0x72, 0x01, 0xD6, 0x99
-			응답의 0x16, 0x05, 0x01 은 항상 같은 값을 가지며, 빨간색 글씨의 0x02, 0x72 가 농도를 나타내는 수치입니다.
-			(HEX) 0x0272 = 626
-			즉, 농도는 626 ppm 입니다. */
-
-			var nValue = g_sink_ready[3] * 256 + g_sink_ready[4];
-
-			console.log(nValue);
-
-			if (tas_state == 'upload') {
-				upload_arr.every((e, idx) => {
-					if(e.ctnam == 'cnt-co2') {
-						var cin = {
-							ctname: e.ctname,
-							con: nValue.toString()
-						}
-
-						console.log('SEND : ' + JSON.stringify(cin) + ' ---->');
-						upload_client.write(JSON.stringify(cin) + '<EOF>');
-						return false
-					} else {
-						return true
-					}
-				})
-
-			}
-
-			g_sink_ready = [];
-			count = 0;
-			g_sink_buf_start = 0;
-		}
-	}
-}
-
-function showPortClose() {
-	console.log('port closed.');
-}
-
-function showError(error) {
-	var error_str = util.format("%s", error);
-	console.log(error.message);
-	if (error_str.substring(0, 14) == "Error: Opening") {
-
-	} else {
-		console.log('SerialPort port error : ' + error);
-	}
-}
-
 setInterval(() => {
-	console.log(`tas_state: ${tas_state}`)
+	// console.log(`tas_state: ${tas_state}`)
+
+	// console.log(upload_arr)
+
+	// console.log(ble.connectedPeripherals)
 	// console.log(`download_count: ${tas_download_count}`)
 }, 500)

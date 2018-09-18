@@ -6,20 +6,24 @@ var characteristicUUIDs = {
   switch: 'bce811bbd35a41318751b6b376c3652a',
   current: 'b9c5cf6fec904ae9b2ebefccbc01595d'
 }
-var connectedPeripherals = []
+const CENTRAL = '[CENTRAL]'
 
+var connectedPeripherals = {} 
 var RSSIs = {}
+var switchStates = {}
+var currentValues = {}
 
 let errTypes = {
+  connectionError: 'Connection Error',
   discoverAllServicesAndCharacteristicsError: 'Discover All Services And Characteristics Error', 
-  subscribingError: 'Subscribing Error',
+  subscribingError: 'subscribing Error',
   readError: 'Read Error',
   writeError: 'Write Error'
 }
 
-console.log('Start BLE Central App')
+console.log(`${CENTRAL} Start BLE Central App`)
 noble.on('stateChange', (state) => {
-  console.log(`State Changed to ${state}`)
+  console.log(`${CENTRAL} State Changed to ${state}`)
 
   if (state === 'poweredOn') {
     noble.startScanning(serviceUUIDs, false)
@@ -29,32 +33,30 @@ noble.on('stateChange', (state) => {
 })
 
 noble.on('discover', (peripheral) => {
-  console.log(`Discovered: ${peripheral.uuid}`)
+  console.log(`${CENTRAL} Discovered: ${peripheral.uuid}`)
 
-  // noble.stopScanning()
+  noble.stopScanning()
 
-  console.log(`Connect to ${peripheral.uuid}`)
+  console.log(`${CENTRAL} Connect to ${peripheral.uuid}`)
 
   try {
     peripheral.connect((err) => {
 
       if (err) {
-        console.log(`Error Ocurred during connecting to ${peripheral.uuid}`)
+        console.log(`${CENTRAL} Error Ocurred during connecting to ${peripheral.uuid}`)
         console.log(err)
 
-        console.log(`Start scanning `)
+        console.log(`${CENTRAL} Start scanning `)
         noble.startScanning(serviceUUIDs, false)
       } else {
-        console.log(`Successfully Connected to ${peripheral.uuid}`)
+        console.log(`${CENTRAL} Successfully Connected to ${peripheral.uuid}`)
 
-        connectedPeripherals.push(peripheral)
-
-        console.log(`Discover all Services and Characteristics `)
-
-
+        console.log(`${CENTRAL} Discover all Services and Characteristics `)
         peripheral.discoverAllServicesAndCharacteristics((err, services, characteristics) => {
+
+          // TODO: problem of discovering forever ... 
           if (err) {
-            console.log(`Error Ocurred during Discovering All Services and Characteristics in ${peripheral.uuid}`)
+            console.log(`${CENTRAL} Error Ocurred during Discovering All Services and Characteristics in ${peripheral.address}`)
             throw {
               err,
               type: errTypes.discoverAllServicesAndCharacteristicsError,
@@ -63,12 +65,9 @@ noble.on('discover', (peripheral) => {
           } else {
 
             var characteristicsOfPeripherals = {
-              peripheral: peripheral,
               rssi: null,
               switch: null,
               current: null,
-              switchState: null,
-              currentValue: null
             }
 
             characteristics.forEach((characteristic) => {
@@ -76,9 +75,10 @@ noble.on('discover', (peripheral) => {
               switch (characteristic.uuid) {
 
                 case characteristicUUIDs.rssi:
+                  characteristicsOfPeripherals.rssi = characteristic  
                   characteristic.subscribe((err) => {
                     if (err) {
-                      console.log(`Error Ocurred during Subscribing ${characteristic.uuid}`)
+                      console.log(`${CENTRAL} Error Ocurred during Subscribing ${characteristic.uuid} on ${peripheral.address}`)
                       throw {
                         err,
                         type: errTypes.subscribingError,
@@ -87,23 +87,25 @@ noble.on('discover', (peripheral) => {
                       }
 
                     } else {
-                      console.log(`Successfully Subscribing ${characteristic.uuid}`)
-
-                      characteristicsOfPeripherals.rssi = characteristic  
+                      console.log(`${CENTRAL} Successfully Subscribing ${characteristic.uuid} on ${peripheral.address}`)
 
                       characteristic.on('data', (data, isNotification) => {
-                        // console.log(`Subscription Data on ${characteristic.uuid}, isNotification: ${isNotification}`)
-                        // console.log(data)
-                        // console.log(data.toString())
 
                         var MAC_RSSI = data.toString().split(" ")
-                       
+                        
+                        if(RSSIs[peripheral.address] === undefined) {
+                          var dummyObj = {}
+                          dummyObj[peripheral.address] = {}
+                          var newRSSIs = Object.assign(RSSIs, dummyObj)
+                          RSSIs = newRSSIs
+                        }
+
                         var obj = {}
                         obj[MAC_RSSI[0]] = MAC_RSSI[1]
-
-                        var newObj = Object.assign(RSSIs, obj)
-                        RSSIs = newObj
-
+                        var newObj = Object.assign(RSSIs[peripheral.address], obj)
+                        RSSIs[peripheral.address] = newObj
+                        
+                        updateConnectedPeripheral(peripheral, characteristicsOfPeripherals)
                       })
                     }
                   })
@@ -112,68 +114,78 @@ noble.on('discover', (peripheral) => {
                 case characteristicUUIDs.current:
                   characteristicsOfPeripherals.current = characteristic
 
-                  setInterval(() => {
-                    characteristic.read((err, data) => {
-                      if (err) {
-                        console.log(`Error Ocurred during Reading ${characteristic.uuid}`)
-                        throw {
-                          err,
-                          peripheral,
-                          characteristic,
-                          type: readError
-                        }
-                      } else {
-
-                        
-                        console.log(`[CURRENT]: Data on ${characteristic.uuid}`)
-                        console.log(data)
-
-
-                        // TODO: What is the type of the data 
-                        // characteristicsOfPeripherals.currentValue = 
+                  characteristic.subscribe((err) => {
+                    if (err) {
+                      console.log(`${CENTRAL} Error Ocurred during Subscribing ${characteristic.uuid} on ${peripheral.address}`)
+                      throw {
+                        err,
+                        type: errTypes.subscribingError,
+                        characteristic,
+                        peripheral,
                       }
-                    })
-                  }, 500)
+
+                    } else {
+                      console.log(`${CENTRAL} Successfully Subscribing ${characteristic.uuid} on ${peripheral.address}`)
+
+                      characteristic.on('data', (data, isNotification) => {
+
+                        var dummyObj = {}
+                        dummyObj[peripheral.address] = data.toString()
+                        var newCurrentValues = Object.assign(currentValues, dummyObj)
+                        currentValues = newCurrentValues 
+                      })
+                    }
+                  })
+
                   break;
                   
                 case characteristicUUIDs.switch:
 
                   characteristicsOfPeripherals.switch = characteristic
 
-                  setInterval(() => {
-                    characteristic.read((err, data) => {
-                      if (err) {
-                        console.log(`Error Ocurred during Reading ${characteristic.uuid}`)
-
-                        throw {
-                          err,
-                          peripheral,
-                          characteristic,
-                          type: errTypes.readError
-                        }
-                      } else {
-
-                        
-                        console.log(`[SWITCH] Data on ${characteristic.uuid}`)
-                        console.log(data)
-                        
-                        characteristicsOfPeripherals.switchState = data === Buffer.from([0x01]) ? true : false
+                  characteristic.subscribe((err) => {
+                    if (err) {
+                      console.log(`${CENTRAL} Error Ocurred during Subscribing ${characteristic.uuid} on ${peripheral.address}`)
+                      throw {
+                        err,
+                        type: errTypes.subscribingError,
+                        characteristic,
+                        peripheral,
                       }
-                    })
-                  }, 500)
+
+                    } else {
+                      console.log(`${CENTRAL} Successfully Subscribing ${characteristic.uuid} on ${peripheral.address}`)
+
+                      characteristic.on('data', (data, isNotification) => {
+
+                        var dummyObj = {}
+                        dummyObj[peripheral.address] = (data[0] == 1) ? true : false
+                        var newSwitchStates = Object.assign(switchStates, dummyObj)
+                        switchStates = newSwitchStates
+                      })
+                    }
+                  })
                   break;
               }
             })
 
-            connectedPeripherals.push(characteristicsOfPeripherals)
+            updateConnectedPeripheral(peripheral, characteristicsOfPeripherals)
+
+            peripheral.once('disconnect', () => {
+              console.log(`${CENTRAL} Disconnected: ${peripheral.address}`)
+
+              delete connectedPeripherals[peripheral.address]
+              delete currentValues[peripheral.address]
+              delete RSSIs[peripheral.address]
+              delete switchStates[peripheral.address]
+            })
+
+            noble.startScanning(serviceUUIDs, false)
           }
         })
       }
     })
   } catch(err) {
-
-    // TODO: Delete added peripheral in the array
-    // connectedPeripherals.includes()
 
     err.peripheral.disconnect((err) => {
       if(err) {
@@ -186,11 +198,32 @@ noble.on('discover', (peripheral) => {
   }
 })
 
+noble.on('scanStart', () => {
+  console.log(`Scan Start`)
+})
 
-module.exports = {
-  connectedPeripherals: connectedPeripherals,
-  setSwitch: (connectedPeripheral, state) => {
-    connectedPeripheral.switch.write(Buffer.from([state ? 0x01 : 0x00], false, (err) => {
+noble.on('scanStop', () => {
+  console.log(`Scan Stop`)
+})
+
+noble.on('warning', (msg) => {
+  console.log(`Warning ${msg}`)
+})
+
+function updateConnectedPeripheral(peripheral, characteristicsOfPeripherals) {
+  var dummyObj = {}
+  dummyObj[peripheral.address] = {
+    peripheral: peripheral,
+    characteristics: characteristicsOfPeripherals
+  }
+  var newConnectedPeripherals = Object.assign(connectedPeripherals, dummyObj)            
+  connectedPeripherals = newConnectedPeripherals
+}
+
+function setSwitch(peripheralAddress, state) {
+  var peripheral = connectedPeripherals[peripheralAddress]
+  if(peripheral) {
+    connectedPeripherals[peripheralAddress].characteristics.switch.write(Buffer.from([state ? 0x01 : 0x00], false, (err) => {
       if (err) {
         console.log(`Error Ocurred during Writing to ${connectedPeripheral.switch}`)
         console.log(err)
@@ -198,6 +231,46 @@ module.exports = {
         console.log(`Successfully Writing to ${connectedPeripheral.switch} state: ${state}`)
       }
     }))
-  },
-  RSSIs: RSSIs 
+  } else {
+    console.log(`${CENTRAL} Cannot write Switch State Because it's not connected`)
+  }
 }
+
+
+module.exports = {
+  connectedPeripherals: connectedPeripherals,
+  setSwitch: setSwitch,
+  RSSIs: RSSIs,
+  currentValues: currentValues,
+  switchStates: switchStates
+}
+
+setInterval(() => {
+  // console.log(`RSSIs: `)
+  console.log(RSSIs)
+  // console.log(`Current Values: `)
+  // console.log(currentValues)
+  // console.log(`Switch States: `)
+  // console.log(switchStates)
+  // console.log(Object.keys(connectedPeripherals))
+
+}, 500)
+
+setInterval(() => {
+  // console.log('[RESET]')
+  Object.keys(connectedPeripherals).forEach(addr => {
+    if(RSSIs[addr]) {
+      RSSIs[addr] = {}
+    } else {
+      delete RSSIs[addr]
+    }
+  })
+}, 5000)
+
+// setInterval(() => {
+//   var addr = '00:0b:57:27:be:57'
+//   var newState = switchStates[addr] ? false : true
+//   console.log(`Set Switch State to ${newState}`)
+//   setSwitch(addr, newState)
+
+// } , 2000)

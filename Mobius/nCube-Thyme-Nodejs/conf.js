@@ -24,8 +24,7 @@ var acp = {};
 conf.useprotocol = 'http'; // select one for 'http' or 'mqtt' or 'coap' or 'ws'
 
 // build cse
-// cse.host        = '203.253.128.161';
-cse.host        = 'localhost';
+cse.host        = '52.78.33.177';
 cse.port        = '7579';
 cse.name        = 'Mobius';
 cse.id          = '/Mobius';
@@ -33,33 +32,45 @@ cse.mqttport    = '1883';
 cse.wsport      = '7577';
 
 // build ae
-ae.name         = 'edu6';
+ae.name         = 'smart-home';
 
 ae.id           = 'S' + ae.name;
 
 ae.parent       = '/' + cse.name;
-ae.appid        = 'measure_co2';
+ae.appid        = 'control_plug';
 ae.port         = '9727';
 ae.bodytype     = 'json'; // select 'json' or 'xml' or 'cbor'
 ae.tasport      = '3105';
 
 // build cnt
 var count = 0;
-cnt_arr[count] = {};
-cnt_arr[count].parent = '/' + cse.name + '/' + ae.name;
-cnt_arr[count++].name = 'co2';
-cnt_arr[count] = {};
-cnt_arr[count].parent = '/' + cse.name + '/' + ae.name;
-cnt_arr[count++].name = 'led';
-cnt_arr[count] = {};
-cnt_arr[count].parent = '/' + cse.name + '/' + ae.name;
-cnt_arr[count++].name = 'temp';
-cnt_arr[count] = {};
-cnt_arr[count].parent = '/' + cse.name + '/' + ae.name;
-cnt_arr[count++].name = 'tvoc';
+// cnt_arr[count] = {};
+// cnt_arr[count].parent = '/' + cse.name + '/' + ae.name;
+// cnt_arr[count++].name = 'co2';
+// cnt_arr[count] = {};
+// cnt_arr[count].parent = '/' + cse.name + '/' + ae.name;
+// cnt_arr[count++].name = 'led';
+// cnt_arr[count] = {};
+// cnt_arr[count].parent = '/' + cse.name + '/' + ae.name;
+// cnt_arr[count++].name = 'temp';
+// cnt_arr[count] = {};
+// cnt_arr[count].parent = '/' + cse.name + '/' + ae.name;
+// cnt_arr[count++].name = 'tvoc';
 cnt_arr[count] = {};
 cnt_arr[count].parent = '/' + cse.name + '/' + ae.name;
 cnt_arr[count++].name = 'timer';
+cnt_arr[count] = {};
+cnt_arr[count].parent = '/' + cse.name + '/' + ae.name;
+cnt_arr[count++].name = 'rssi';
+cnt_arr[count] = {};
+cnt_arr[count].parent = '/' + cse.name + '/' + ae.name;
+cnt_arr[count++].name = 'switch';
+cnt_arr[count] = {};
+cnt_arr[count].parent = '/' + cse.name + '/' + ae.name;
+cnt_arr[count++].name = 'amps';
+cnt_arr[count] = {};
+cnt_arr[count].parent = '/' + cse.name + '/' + ae.name;
+cnt_arr[count++].name = 'plug';
 
 // build sub
 count = 0;
@@ -71,6 +82,10 @@ count = 0;
 // --------
 sub_arr[count] = {};
 sub_arr[count].parent = '/' + cse.name + '/' + ae.name + '/' + cnt_arr[1].name;
+sub_arr[count].name = 'sub';
+sub_arr[count++].nu = 'mqtt://' + cse.host + '/' + ae.id + '?ct=' + ae.bodytype; // mqtt
+sub_arr[count] = {};
+sub_arr[count].parent = '/' + cse.name + '/' + ae.name + '/' + 'switch' 
 sub_arr[count].name = 'sub';
 sub_arr[count++].nu = 'mqtt://' + cse.host + '/' + ae.id + '?ct=' + ae.bodytype; // mqtt
 //sub_arr[count++].nu = 'http://' + ip.address() + ':' + ae.port + '/noti?ct=json'; // http

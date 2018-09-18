@@ -1,0 +1,16 @@
+version: '2.1'
+
+services:
+  db:
+    image: mysql/mysql-server
+
+  mobius:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    ports:
+      - "7579:7579"
+    links:
+      - db
+    volumes:
+      - ./:/app/
