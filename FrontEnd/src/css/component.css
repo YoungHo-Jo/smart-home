@@ -1,0 +1,123 @@
+
+/*
+Chart
+*/
+#dashboard-wrapper{
+    position: relative;
+    left:7%;
+    width:95%;
+}
+
+#Line{
+    position: relative;
+    border-top: 2px solid darkslategray;
+    top:70px;
+    margin: 1%;
+    width:88%;
+    padding: 0 0 ;
+    box-shadow: 0 12px 16px 0 rgba(0,0,0,0.14),0 17px 50px 0 rgba(0,0,0,.1);
+}
+
+#donut-wrapper{
+    position: relative;
+    top:150px;
+    width: 90%;
+    display: flex;
+    margin: 1%;
+}
+
+#donut-wrapper .donut{
+    border-top: 2px solid darkslategray;
+    box-shadow: 0 12px 16px 0 rgba(0,0,0,0.14),0 17px 50px 0 rgba(0,0,0,.1);
+    flex: 1;
+    padding-top: 3%;
+    margin-right: 30px;
+    width: 50%;
+}
+
+.table-setting{
+    display: inline-block;
+    float:left;
+    margin:10px 30px;
+    width:40%;
+    background-color: rgba(255,255,255,0.3);
+}
+
+#barchart-wrapper{
+    height: 50%;
+    padding: 0 0;
+    width: 70%;
+    margin: auto auto;
+
+}
+
+
+/*
+PlanButton
+*/
+
+
+
+#plan-contain{
+    text-align: center;
+    width: 100%;
+    padding: 0 0.2px;
+}
+
+.plan{
+    width:96%;
+    border-radius: 3px;
+    margin: 1px 1px;
+}
+
+.button-hidden{
+    visibility: hidden;
+    width:9%;
+
+}
+.button-reveal{
+    width:9%;
+    padding:0.5%;
+    background-color: #00cc99;
+    color: white;
+    border: none;
+    margin: 1px 1px;
+    text-decoration: none;
+    -webkit-transition-duration: 0.4s;
+    transition-duration: 0.4s;
+    cursor: pointer;
+}
+
+.button-reveal:hover{
+    background-color: white;
+    color: #00cc99;
+    border: 2px solid #00cc99;
+}
+
+
+.StatusTable{
+    width:80%;
+    border: 3px solid yellow;
+    margin:20px auto;
+    background-color: rgba(255,255,255,0.4);
+    color:white;
+}
+
+.StatusTable button{
+    width:100%;
+    border-radius: 5px;
+    border: none;
+    text-decoration: none;
+}
+
+.StatusTable button:hover{
+    background-color: rgba(0,0,0,0.2);
+
+}
+
+
+#plan-btn{
+    border: 2px solid white;
+    width:90%;
+    margin:20px auto;
+}

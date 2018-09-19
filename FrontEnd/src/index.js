@@ -1,31 +1,32 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './css/index.css';
+import App from './App';
+import Dashboard from './pages/Dashboard'
+import ReservedPlug from './pages/ReservedPlug'
+import CheckConsump from './pages/CheckConsump'
+import RemoteControl from './pages/RemoteControl'
+import 'bootstrap/dist/css/bootstrap.min.css';
+
+//import 'semantic-ui-css/semantic.min.css';
+
 import {BrowserRouter as Router, Route} from 'react-router-dom'
-import 'semantic-ui-css/semantic.min.css';
-
-
-import Monitoring from "./Component/Monitoring";
-import App from "./App"
-import ObjTime from "./Component/Obj_Time";
-import EditForm from "./Component/EditForm";
-import checkpage from "./checkpage";
-import Home from "./Home"
-import schedule from './Component/schedule'
 
 
 ReactDOM.render(
     <Router>
         <div>
             <Route path="/" component={App}/>
-            <Route path="/Home" component={Home}/>
-            <Route path="/EditForm/:obj_id" component={EditForm}/>
-            <Route path="/ObjTime" component={ObjTime} />
-            <Route path="/Monitoring" component={Monitoring}/>
-            <Route path="/checkpage" component={checkpage}/>
-            <Route path="/schedule" component={schedule}/>
+            <Route path="/Dashboard" component={Dashboard}/>
+            <Route path="/ReservedStatus" component={ReservedPlug}/>
+            <Route path="/CheckConsump" component={CheckConsump}/>
+            <Route path="/RemoteControl" component={RemoteControl}/>
+
+            />
 
         </div>
     </Router>,
     document.getElementById('root')
 );
+
+//<Route path="/test" component={test}

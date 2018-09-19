@@ -3,7 +3,7 @@
 /**
  * Module of mixed-in functions shared between node and client code
  */
-var isObject = require('./is-object');
+const isObject = require('./is-object');
 
 /**
  * Expose `RequestBase`.
@@ -30,7 +30,7 @@ function RequestBase(obj) {
  */
 
 function mixin(obj) {
-  for (var key in RequestBase.prototype) {
+  for (const key in RequestBase.prototype) {
     obj[key] = RequestBase.prototype[key];
   }
   return obj;
@@ -122,7 +122,7 @@ RequestBase.prototype.timeout = function timeout(options){
     return this;
   }
 
-  for(var option in options) {
+  for(const option in options) {
     switch(option) {
       case 'deadline':
         this._timeout = options.deadline;
@@ -158,7 +158,7 @@ RequestBase.prototype.retry = function retry(count, fn){
   return this;
 };
 
-var ERROR_CODES = [
+const ERROR_CODES = [
   'ECONNRESET',
   'ETIMEDOUT',
   'EADDRINFO',
@@ -179,7 +179,7 @@ RequestBase.prototype._shouldRetry = function(err, res) {
   }
   if (this._retryCallback) {
     try {
-      var override = this._retryCallback(err, res);
+      const override = this._retryCallback(err, res);
       if (override === true) return true;
       if (override === false) return false;
       // undefined falls back to defaults
@@ -230,12 +230,13 @@ RequestBase.prototype._retry = function() {
 
 RequestBase.prototype.then = function then(resolve, reject) {
   if (!this._fullfilledPromise) {
-    var self = this;
+    const self = this;
     if (this._endCalled) {
       console.warn("Warning: superagent request was sent twice, because both .end() and .then() were called. Never call .end() if you use promises");
     }
-    this._fullfilledPromise = new Promise(function(innerResolve, innerReject) {
-      self.end(function(err, res) {
+    this._fullfilledPromise = new Promise((innerResolve, innerReject) => {
+      self.on('error', innerReject);
+      self.end((err, res) => {
         if (err) innerReject(err);
         else innerResolve(res);
       });
@@ -325,7 +326,7 @@ RequestBase.prototype.getHeader = RequestBase.prototype.get;
 
 RequestBase.prototype.set = function(field, val){
   if (isObject(field)) {
-    for (var key in field) {
+    for (const key in field) {
       this.set(key, field[key]);
     }
     return this;
@@ -379,18 +380,18 @@ RequestBase.prototype.field = function(name, val) {
   }
 
   if (this._data) {
-    console.error(".field() can't be used if .send() is used. Please use only .send() or only .field() & .attach()");
+    throw new Error(".field() can't be used if .send() is used. Please use only .send() or only .field() & .attach()");
   }
 
   if (isObject(name)) {
-    for (var key in name) {
+    for (const key in name) {
       this.field(key, name[key]);
     }
     return this;
   }
 
   if (Array.isArray(val)) {
-    for (var i in val) {
+    for (const i in val) {
       this.field(name, val[i]);
     }
     return this;
@@ -428,7 +429,7 @@ RequestBase.prototype.abort = function(){
 RequestBase.prototype._auth = function(user, pass, options, base64Encoder) {
   switch (options.type) {
     case 'basic':
-      this.set('Authorization', 'Basic ' + base64Encoder(user + ':' + pass));
+      this.set('Authorization', `Basic ${base64Encoder(`${user}:${pass}`)}`);
       break;
 
     case 'auto':
@@ -437,7 +438,7 @@ RequestBase.prototype._auth = function(user, pass, options, base64Encoder) {
       break;
 
     case 'bearer': // usage would be .auth(accessToken, { type: 'bearer' })
-      this.set('Authorization', 'Bearer ' + user);
+      this.set('Authorization', `Bearer ${user}`);
       break;
   }
   return this;
@@ -548,11 +549,11 @@ RequestBase.prototype.toJSON = function() {
  */
 
 RequestBase.prototype.send = function(data){
-  var isObj = isObject(data);
-  var type = this._header['content-type'];
+  const isObj = isObject(data);
+  let type = this._header['content-type'];
 
   if (this._formData) {
-    console.error(".send() can't be used if .attach() or .field() is used. Please use only .send() or only .field() & .attach()");
+    throw new Error(".send() can't be used if .attach() or .field() is used. Please use only .send() or only .field() & .attach()");
   }
 
   if (isObj && !this._data) {
@@ -567,7 +568,7 @@ RequestBase.prototype.send = function(data){
 
   // merge
   if (isObj && isObject(this._data)) {
-    for (var key in data) {
+    for (const key in data) {
       this._data[key] = data[key];
     }
   } else if ('string' == typeof data) {
@@ -576,7 +577,7 @@ RequestBase.prototype.send = function(data){
     type = this._header['content-type'];
     if ('application/x-www-form-urlencoded' == type) {
       this._data = this._data
-        ? this._data + '&' + data
+        ? `${this._data}&${data}`
         : data;
     } else {
       this._data = (this._data || '') + data;
@@ -634,16 +635,16 @@ RequestBase.prototype.sortQuery = function(sort) {
  * @api private
  */
 RequestBase.prototype._finalizeQueryString = function(){
-  var query = this._query.join('&');
+  const query = this._query.join('&');
   if (query) {
     this.url += (this.url.indexOf('?') >= 0 ? '&' : '?') + query;
   }
   this._query.length = 0; // Makes the call idempotent
 
   if (this._sort) {
-    var index = this.url.indexOf('?');
+    const index = this.url.indexOf('?');
     if (index >= 0) {
-      var queryArr = this.url.substring(index + 1).split('&');
+      const queryArr = this.url.substring(index + 1).split('&');
       if ('function' === typeof this._sort) {
         queryArr.sort(this._sort);
       } else {
@@ -655,7 +656,7 @@ RequestBase.prototype._finalizeQueryString = function(){
 };
 
 // For backwards compat only
-RequestBase.prototype._appendQueryString = function() {console.trace("Unsupported");}
+RequestBase.prototype._appendQueryString = () => {console.trace("Unsupported");}
 
 /**
  * Invoke callback with timeout error.
@@ -667,7 +668,7 @@ RequestBase.prototype._timeoutError = function(reason, timeout, errno){
   if (this._aborted) {
     return;
   }
-  var err = new Error(reason + timeout + 'ms exceeded');
+  const err = new Error(`${reason + timeout}ms exceeded`);
   err.timeout = timeout;
   err.code = 'ECONNABORTED';
   err.errno = errno;
@@ -677,17 +678,17 @@ RequestBase.prototype._timeoutError = function(reason, timeout, errno){
 };
 
 RequestBase.prototype._setTimeouts = function() {
-  var self = this;
+  const self = this;
 
   // deadline
   if (this._timeout && !this._timer) {
-    this._timer = setTimeout(function(){
+    this._timer = setTimeout(() => {
       self._timeoutError('Timeout of ', self._timeout, 'ETIME');
     }, this._timeout);
   }
   // response timeout
   if (this._responseTimeout && !this._responseTimeoutTimer) {
-    this._responseTimeoutTimer = setTimeout(function(){
+    this._responseTimeoutTimer = setTimeout(() => {
       self._timeoutError('Response timeout of ', self._responseTimeout, 'ETIMEDOUT');
     }, this._responseTimeout);
   }
