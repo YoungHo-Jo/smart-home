@@ -28,12 +28,14 @@ class ReservedPlug extends Component{
     render(){
         return(
             <main>
-                <h3>TESTING..</h3>
+
                 <div class="table-setting">
-                <ReservedTable data={this.state.time}/>
+                    Plug-Time
+                    <ReservedTable data={this.state.time}/>
                 </div>
 
                 <div className="table-setting">
+                    Time-Plug
                     <ReservedTable data={this.state.time}/>
                 </div>
             </main>

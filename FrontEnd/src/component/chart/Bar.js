@@ -1,5 +1,7 @@
 import React from 'react'
 import { VictoryBar, VictoryChart, VictoryAxis, VictoryTheme, VictoryContainer } from 'victory'
+import 'superagent'
+
 
 export default class Bar extends React.Component {
     constructor(props){

@@ -12,10 +12,10 @@ class Dashboard extends React.Component{
             <main>
                 <div id='dashboard-wrapper'>
                     <div id='home-button-group'>
-                        <button className='btn'>Today <HalfDonut angle={90} width={700}/></button>
-                        <button className='btn'>LastMonth <HalfDonut angle={90} width={700}/></button>
-                        <button className='btn'>Consumption <HalfDonut angle={90} width={700}/></button>
-                        <button className='btn'>Goals <HalfDonut angle={90} width={700}/></button>
+                        <button className='btn'>Today <HalfDonut url="" angle={90} width={700}/></button>
+                        <button className='btn'>LastMonth <HalfDonut url="" angle={90} width={700}/></button>
+                        <button className='btn'>Consumption <HalfDonut url="" angle={90} width={700}/></button>
+                        <button className='btn'>Goals <HalfDonut url="" angle={90} width={700}/></button>
                     </div>
                     <div id='Line'>
                        <Line/>
