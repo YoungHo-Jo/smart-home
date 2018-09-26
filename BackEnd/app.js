@@ -31,6 +31,6 @@ function sendJSON(res, result, obj){
     res.json(obj)
 }
 
-app.listen(3001,()=>{
+app.listen(app.get('port'),()=>{
     console.log('server is starting..')
 })

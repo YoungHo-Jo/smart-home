@@ -1,25 +1,34 @@
 import React from 'react'
 import {VictoryAxis, VictoryChart, VictoryLine, VictoryTheme} from 'victory'
-
-const data=[
-    { x: 1, y: 2 }, { x: 2, y: 3 }, { x: 3, y: 5 }, { x: 4, y: 4 }, { x: 6, y: 7 },
-    { x: 7, y: 2 }, { x: 8, y: 3 }, { x: 11, y: 2 }, { x: 12, y: 3 },
-    { x: 13, y: 5 }, { x: 14, y: 4 }, { x: 16, y: 7 }, { x: 17, y: 2 },
-    { x: 18, y: 3 }, { x: 21, y: 2 }, { x: 22, y: 3 }, { x: 23, y: 5 },
-    { x: 24, y: 4 }, { x: 26, y: 7 }, { x: 27, y: 2 }, { x: 28, y: 3 },
-]
-
+import request from 'superagent'
 
 class Line extends React.Component {
-    render() {
+    state={
+        data:[],
+    }
+    componentDidMount() {
+        request
+            .get('http://localhost:3001/line')
+            .end((err, res) => {
+                if (err) console.log(err);
+                this.setState({data:res.body});
+            })
+    }
+    render(){
+        const items=this.state.data.map(value=>(
+            {
+                x:parseInt(value.date.substr(8,2)),
+                y:value.sum*0.001,
+            }
+        ))
+        console.log(items);
         return (
             <VictoryChart
                 theme={VictoryTheme.material}
                 height ={50}
                 width = {300}
-                padding={12}
-                margin={0}
-                domainPadding={{x:40, y:10}}
+                padding={11}
+                margin={5}
             >
 
                 <VictoryAxis
@@ -34,7 +43,7 @@ class Line extends React.Component {
                     style={{
                         axis: {stroke: "rgba(255,255,255, 0.1)"},
                         ticks: {stroke: "black", size: 1},
-                        tickLabels: {fontSize: 5, padding: 5}
+                        tickLabels: {fontSize: 5, padding: 1}
                     }} />
 
 
@@ -45,7 +54,7 @@ class Line extends React.Component {
                         labels: {fontsize:10},
                         x: "month",
                     }}
-                    data={data}
+                    data={items}
                 />
             </VictoryChart>
         )

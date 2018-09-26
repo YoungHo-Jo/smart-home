@@ -21,8 +21,8 @@ class Dashboard extends React.Component{
                        <Line/>
                     </div>
                     <div id='donut-wrapper'>
-                        <div className='donut'><Donut/></div>
-                        <div className='donut'><Donut/></div>
+                        <div className='donut'><Donut month={9}/></div>
+                        <div className='donut'><Donut month={8}/></div>
                     </div>
                 </div>
             </main>
