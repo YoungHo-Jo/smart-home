@@ -219,7 +219,7 @@ function uploadPlugs() {
 					con: Object.keys(ble.connectedPeripherals)
 				}
 
-				console.log(`SEND: ${JSON.stringify(cin)} ---->`)
+				// console.log(`SEND: ${JSON.stringify(cin)} ---->`)
 				upload_client.write(JSON.stringify(cin) + '<EOF>')
 				return false
 			} else {
@@ -239,7 +239,7 @@ function uploadRSSIs() {
 						con: ble.RSSIs
 					}	
 
-					console.log(`SEND: ${JSON.stringify(cin)} ---->`)
+					// console.log(`SEND: ${JSON.stringify(cin)} ---->`)
 					upload_client.write(JSON.stringify(cin) + '<EOF>')
 					return false
 			} else {
@@ -258,7 +258,7 @@ function uploadSwitchState() {
 						con: ble.switchStates
 					}	
 
-					console.log(`SEND: ${JSON.stringify(cin)} ---->`)
+					// console.log(`SEND: ${JSON.stringify(cin)} ---->`)
 					upload_client.write(JSON.stringify(cin) + '<EOF>')
 					return false
 			} else {
@@ -278,7 +278,7 @@ function uploadAmps() {
 						con: ble.currentValues
 					}	
 
-					console.log(`SEND: ${JSON.stringify(cin)} ---->`)
+					// console.log(`SEND: ${JSON.stringify(cin)} ---->`)
 					upload_client.write(JSON.stringify(cin) + '<EOF>')
 					return false
 			} else {

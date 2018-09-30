@@ -98,12 +98,27 @@ noble.on('discover', (peripheral) => {
                           dummyObj[peripheral.address] = {}
                           var newRSSIs = Object.assign(RSSIs, dummyObj)
                           RSSIs = newRSSIs
+                        } 
+                        
+                        if(RSSIs[peripheral.address][MAC_RSSI[0]] == undefined) {
+                          var obj = {}
+                          obj[MAC_RSSI[0]] = {
+                            avg: 0,
+                            arr: [
+                              parseInt(MAC_RSSI[1])
+                            ]
+                          }
+                          var newObj = Object.assign(RSSIs[peripheral.address], obj)
+                          RSSIs[peripheral.address] = newObj
+                        } else {
+                          var avg = addRssi(peripheral.address, MAC_RSSI[0], parseInt(MAC_RSSI[1]))
+                          if(MAC_RSSI[0] === '30:ae:a4:01:bf:a2') console.log('avg: ', avg)
+                          RSSIs[peripheral.address][MAC_RSSI[0]].avg = avg
                         }
-
-                        var obj = {}
-                        obj[MAC_RSSI[0]] = MAC_RSSI[1]
-                        var newObj = Object.assign(RSSIs[peripheral.address], obj)
-                        RSSIs[peripheral.address] = newObj
+                        // var obj = {}
+                        // obj[MAC_RSSI[0]] = MAC_RSSI[1]
+                        // var newObj = Object.assign(RSSIs[peripheral.address], obj)
+                        // RSSIs[peripheral.address] = newObj
                         
                         updateConnectedPeripheral(peripheral, characteristicsOfPeripherals)
                       })
@@ -247,7 +262,7 @@ module.exports = {
 
 setInterval(() => {
   // console.log(`RSSIs: `)
-  console.log(RSSIs)
+  // console.log(RSSIs)
   // console.log(`Current Values: `)
   // console.log(currentValues)
   // console.log(`Switch States: `)
@@ -256,16 +271,16 @@ setInterval(() => {
 
 }, 500)
 
-setInterval(() => {
-  // console.log('[RESET]')
-  Object.keys(connectedPeripherals).forEach(addr => {
-    if(RSSIs[addr]) {
-      RSSIs[addr] = {}
-    } else {
-      delete RSSIs[addr]
-    }
-  })
-}, 5000)
+// setInterval(() => {
+//   // console.log('[RESET]')
+//   Object.keys(connectedPeripherals).forEach(addr => {
+//     if(RSSIs[addr]) {
+//       RSSIs[addr] = {}
+//     } else {
+//       delete RSSIs[addr]
+//     }
+//   })
+// }, 5000)
 
 // setInterval(() => {
 //   var addr = '00:0b:57:27:be:57'
@@ -274,3 +289,37 @@ setInterval(() => {
 //   setSwitch(addr, newState)
 
 // } , 2000)
+
+function getMedian(plug, mac, ratio = 1) {
+  var minRSSI = RSSIs[plug][mac].arr[0]
+  var maxRSSI = RSSIs[plug][mac].arr[0]
+  var curMedian =  RSSIs[plug][mac].arr[0]
+  var avg = 0
+
+  RSSIs[plug][mac].arr.forEach((v, i) => {
+    if(i == 0) return
+    minRSSI = Math.min(minRSSI, v)
+    maxRSSI = Math.max(maxRSSI, v)
+
+    curMedian = (curMedian * i/(i+1) + v * 1/(i+1)).toFixed(2)
+  })
+
+  if(maxRSSI === minRSSI) return maxRSSI
+
+  RSSIs[plug][mac].arr.forEach((v, i) => {
+    avg += v + (v - curMedian)/(maxRSSI - minRSSI)*ratio
+  }) 
+
+  return (avg/RSSIs[plug][mac].arr.length).toFixed(2)
+}
+
+function addRssi(plug, mac, value, size = 60, cutRatio = 1) {
+  var median = -1
+
+  RSSIs[plug][mac].arr.push(value)
+  if(RSSIs[plug][mac].arr.length === size) {
+    median = getMedian(plug, mac)
+    RSSIs[plug][mac].arr = RSSIs[plug][mac].arr.slice(size*cutRatio, size)
+  }
+  return median
+}
