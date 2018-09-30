@@ -5,9 +5,11 @@
     "fs": "0.0.2",
     "js2xmlparser": "^1.0.0",
     "net": "^1.0.2",
+    "noble": "^1.9.1",
+    "noble-mac": "git+https://github.com/Timeular/noble-mac.git",
+    "node-addon-api": "^1.4.0",
     "shortid": "^2.2.8",
-    "xml2js": "^0.4.12",
-    "noble": "^1.9.1"
+    "xml2js": "^0.4.12"
   },
   "description": "tas of &Cube",
   "main": "app.js",
