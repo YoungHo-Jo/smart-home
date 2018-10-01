@@ -2,7 +2,7 @@ var net = require('net');
 var util = require('util');
 var fs = require('fs');
 var xml2js = require('xml2js');
-var ble = require('./ble')
+var ble = require('./ble-mac')
 
 
 var wdt = require('./wdt');
@@ -130,7 +130,7 @@ function on_receive(data) {
 
 								if(sink_obj.con && sink_obj.con.hasOwnProperty('cmd'))  {
 									console.log("========================")
-									for(var key in sink_obj.con) {
+									for(var key in sink_obj.con.cmd) {
 										var value = sink_obj.con.cmd[key]
 										if(value == true || value == false) {
 											ble.setSwitch(key, value)

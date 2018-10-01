@@ -114,36 +114,36 @@ noble.on('discover', (peripheral) => {
                           RSSIs = newRSSIs
                         }
 
-                        // var obj = {}
-                        // obj[MAC_RSSI[0]] = MAC_RSSI[1]
-                        // var newObj = Object.assign(RSSIs[peripheral.address], obj)
-                        // RSSIs[peripheral.address] = newObj
-                        if(RSSIs[peripheral.address][MAC_RSSI[0]] == undefined) {
-                          var obj = {}
-                          obj[MAC_RSSI[0]] = [parseInt(MAC_RSSI[1])]
-                          var newObj = Object.assign(RSSIs[peripheral.address], obj)
-                          RSSIs[peripheral.address] = newObj
-                        } else {
-                            var avg = 0;
-                          if(MAC_RSSI[0] === "30:ae:a4:01:bf:a2") {
-                            RSSIs[peripheral.address][MAC_RSSI[0]].forEach(e => {
-                              avg += e 
-                            })
-                            // console.log(`${MAC_RSSI[0]} Avg: ${avg/RSSIs[peripheral.address][MAC_RSSI[0]].length}`)
-                          }
-                          if(RSSIs[peripheral.address][MAC_RSSI[0]].length >= 30) RSSIs[peripheral.address][MAC_RSSI[0]] = RSSIs[peripheral.address][MAC_RSSI[0]].slice(3)
-                          if(MAC_RSSI[1] >= avg - 5 && avg + 5 <= MAC_RSSI[1])
-                            RSSIs[peripheral.address][MAC_RSSI[0]].push(MAC_RSSI[1])
-                          // RSSIs[peripheral.address][MAC_RSSI[0]].pushWithLimit(MAC_RSSI[1], 10)
+                        var obj = {}
+                        obj[MAC_RSSI[0]] = MAC_RSSI[1]
+                        var newObj = Object.assign(RSSIs[peripheral.address], obj)
+                        RSSIs[peripheral.address] = newObj
+                        // if(RSSIs[peripheral.address][MAC_RSSI[0]] == undefined) {
+                        //   var obj = {}
+                        //   obj[MAC_RSSI[0]] = [parseInt(MAC_RSSI[1])]
+                        //   var newObj = Object.assign(RSSIs[peripheral.address], obj)
+                        //   RSSIs[peripheral.address] = newObj
+                        // } else {
+                        //     var avg = 0;
+                        //   if(MAC_RSSI[0] === "30:ae:a4:01:bf:a2") {
+                        //     RSSIs[peripheral.address][MAC_RSSI[0]].forEach(e => {
+                        //       avg += e 
+                        //     })
+                        //     // console.log(`${MAC_RSSI[0]} Avg: ${avg/RSSIs[peripheral.address][MAC_RSSI[0]].length}`)
+                        //   }
+                        //   if(RSSIs[peripheral.address][MAC_RSSI[0]].length >= 30) RSSIs[peripheral.address][MAC_RSSI[0]] = RSSIs[peripheral.address][MAC_RSSI[0]].slice(3)
+                        //   if(MAC_RSSI[1] >= avg - 5 && avg + 5 <= MAC_RSSI[1])
+                        //     RSSIs[peripheral.address][MAC_RSSI[0]].push(MAC_RSSI[1])
+                        //   // RSSIs[peripheral.address][MAC_RSSI[0]].pushWithLimit(MAC_RSSI[1], 10)
 
-                          avg = 0
-                          if(MAC_RSSI[0] === "30:ae:a4:01:bf:a2") {
-                            RSSIs[peripheral.address][MAC_RSSI[0]].forEach(e => {
-                              avg += parseInt(e); 
-                            })
-                            console.log(`${MAC_RSSI[0]} Avg: ${avg/RSSIs[peripheral.address][MAC_RSSI[0]].length}`)
-                          }
-                        }
+                        //   avg = 0
+                        //   if(MAC_RSSI[0] === "30:ae:a4:01:bf:a2") {
+                        //     RSSIs[peripheral.address][MAC_RSSI[0]].forEach(e => {
+                        //       avg += parseInt(e); 
+                        //     })
+                        //     console.log(`${MAC_RSSI[0]} Avg: ${avg/RSSIs[peripheral.address][MAC_RSSI[0]].length}`)
+                        //   }
+                        // }
                         
                         updateConnectedPeripheral(peripheral, characteristicsOfPeripherals)
                       })
@@ -261,6 +261,7 @@ function updateConnectedPeripheral(peripheral, characteristicsOfPeripherals) {
 }
 
 function setSwitch(peripheralAddress, state) {
+  console.error(`Set Switch ${peripheralAddress} to ${state}`)
   var peripheral = connectedPeripherals[peripheralAddress]
   if(peripheral) {
     connectedPeripherals[peripheralAddress].characteristics.switch.write(Buffer.from([state ? 0x01 : 0x00], false, (err) => {
@@ -288,10 +289,10 @@ module.exports = {
 setInterval(() => {
   // console.log(`RSSIs: `)
   // console.log(RSSIs)
-  console.log(`Current Values: `)
-  console.log(currentValues)
-  console.log(`Switch States: `)
-  console.log(switchStates)
+  // console.log(`Current Values: `)
+  // console.log(currentValues)
+  // console.log(`Switch States: `)
+  // console.log(switchStates)
   // console.log(Object.keys(connectedPeripherals))
 
 }, 500)
@@ -307,11 +308,11 @@ setInterval(() => {
   // })
 }, 5000)
 
-setInterval(() => {
-  // var addr = '00:0b:57:27:be:57'
-  var addr = '00-0b-57-27-be-57'
-  var newState = switchStates[addr] ? false : true
-  console.log(`Set Switch State to ${newState}`)
-  setSwitch(addr, newState)
+// setInterval(() => {
+//   // var addr = '00:0b:57:27:be:57'
+//   var addr = '00-0b-57-27-be-57'
+//   var newState = switchStates[addr] ? false : true
+//   console.log(`Set Switch State to ${newState}`)
+//   setSwitch(addr, newState)
 
-} , 2000)
+// } , 2000)
