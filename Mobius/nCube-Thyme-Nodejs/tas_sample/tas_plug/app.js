@@ -2,8 +2,7 @@ var net = require('net');
 var util = require('util');
 var fs = require('fs');
 var xml2js = require('xml2js');
-var ble = require('./ble-mac')
-
+var ble = require('./ble')
 
 var wdt = require('./wdt');
 
@@ -126,8 +125,6 @@ function on_receive(data) {
 								})
 								console.log(`${g_down_buf} <----`)
 
-								// TODO: Write codes of controlling the switch 
-
 								if(sink_obj.con && sink_obj.con.hasOwnProperty('cmd'))  {
 									console.log("========================")
 									for(var key in sink_obj.con.cmd) {
@@ -151,9 +148,6 @@ function on_receive(data) {
 	}
 }
 
-
-// var SerialPort = null;
-// var myPort = null;
 function tas_watchdog() {
 	if (tas_state == 'init') {
 		upload_client = new net.Socket();
@@ -175,7 +169,6 @@ function tas_watchdog() {
 			console.log('tas init ok');
 			tas_state = 'init_ble';
 		}
-	} else if (tas_state == 'init_ble') {
 		// TODO: Init BLE central  
 		
 		console.log('tas init ble ok')
@@ -214,9 +207,13 @@ function uploadPlugs() {
 	if(tas_state === 'upload') {
 		upload_arr.every((e, idx) => {
 			if(e.ctname === 'plug') {
+				var plugsAndName = {}
+				Object.keys(ble.connectedPeripherals).forEach(key => {
+					if(!plugsAndName[key]) plugsAndName[key] = ble.connectedPeripherals[key].name
+				})
 				var cin = {
 					ctname: e.ctname,
-					con: Object.keys(ble.connectedPeripherals)
+					con: plugsAndName
 				}
 
 				// console.log(`SEND: ${JSON.stringify(cin)} ---->`)
@@ -288,12 +285,3 @@ function uploadAmps() {
 	}
 }
 var g_down_buf = '';
-
-setInterval(() => {
-	// console.log(`tas_state: ${tas_state}`)
-
-	// console.log(upload_arr)
-
-	// console.log(ble.connectedPeripherals)
-	// console.log(`download_count: ${tas_download_count}`)
-}, 500)

@@ -229,7 +229,8 @@ function updateConnectedPeripheral(peripheral, characteristicsOfPeripherals) {
   var dummyObj = {}
   dummyObj[peripheral.address] = {
     peripheral: peripheral,
-    characteristics: characteristicsOfPeripherals
+    characteristics: characteristicsOfPeripherals,
+    name: peripheral.advertisement.localName
   }
   var newConnectedPeripherals = Object.assign(connectedPeripherals, dummyObj)            
   connectedPeripherals = newConnectedPeripherals
