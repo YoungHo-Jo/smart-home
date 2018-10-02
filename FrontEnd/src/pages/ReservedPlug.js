@@ -11,8 +11,9 @@ class ReservedPlug extends Component{
 
     componentDidMount(){
             request
-                .get('http://localhost:3001/scheduling_test')
+                .get('http://localhost:3010/tablepage/scheduling_table')
                 .end((err,res)=>{
+                    console.log(res);
                     if (err) console.log(err);
                     this.setState({
                         plugs:res.body[0].plug,

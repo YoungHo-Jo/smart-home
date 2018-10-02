@@ -8,7 +8,7 @@ class Line extends React.Component {
     }
     componentDidMount() {
         request
-            .get('http://localhost:3001/line')
+            .get('http://localhost:3010/dashboard/line')
             .end((err, res) => {
                 if (err) console.log(err);
                 this.setState({data:res.body});
