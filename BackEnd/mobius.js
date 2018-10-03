@@ -39,12 +39,12 @@ module.exports = function(io) {
           setTimeout(() => {
             setSwitchState(plugMacMapping[jsonObj.plug], jsonObj.toState)
             
-          }, after*1000);
+          }, jsonObj.after*1000);
 
           io.emit('prediction', msg.toString())
 
         } catch(e) {
-
+          console.log(e)
         }
       } else if(topic === '/oneM2M/req/Mobius/Ssmart-home/json') {
         try {
