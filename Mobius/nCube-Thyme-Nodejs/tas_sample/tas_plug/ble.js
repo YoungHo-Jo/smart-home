@@ -148,7 +148,10 @@ noble.on('discover', (peripheral) => {
                       characteristic.on('data', (data, isNotification) => {
 
                         var dummyObj = {}
-                        dummyObj[peripheral.address] = data.readUInt16LE()
+                        var value = data.readUInt16LE()
+                        value = value < 200 ? 0 : value
+                        dummyObj[peripheral.address] = value
+                        
                         var newCurrentValues = Object.assign(currentValues, dummyObj)
                         currentValues = newCurrentValues 
                         updateConnectedPeripheral(peripheral, characteristicsOfPeripherals)

@@ -199,7 +199,7 @@ function tas_watchdog() {
 wdt.set_wdt(require('shortid').generate(), 2, timer_upload_action);
 wdt.set_wdt(require('shortid').generate(), 1, tas_watchdog);
 wdt.set_wdt(require('shortid').generate(), 1, uploadRSSIs);
-wdt.set_wdt(require('shortid').generate(), 1, uploadSwitchState);
+wdt.set_wdt(require('shortid').generate(), 2, uploadSwitchState);
 wdt.set_wdt(require('shortid').generate(), 1, uploadAmps);
 wdt.set_wdt(require('shortid').generate(), 10, uploadPlugs);
 
@@ -238,7 +238,7 @@ function uploadRSSIs() {
 					var plugsAndRssi = {}
 					Object.keys(ble.RSSIs).forEach(key => {
 						var tmp = {}
-						if(ble.RSSIs[key]['30:ae:a4:01:bf:a2'].avg) {
+						if(ble.RSSIs[key]['30:ae:a4:01:bf:a2'] != undefined && ble.RSSIs[key]['30:ae:a4:01:bf:a2']['avg'] != undefined) {
 							tmp[key] = ble.RSSIs[key]['30:ae:a4:01:bf:a2'].avg
 						}
 						var newObj = Object.assign(plugsAndRssi, tmp)
