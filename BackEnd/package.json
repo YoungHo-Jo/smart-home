@@ -1,5 +1,5 @@
 {
-  "scripts":{
+  "scripts": {
     "start": "node app.js"
   },
   "name": "homieot",
@@ -12,6 +12,7 @@
     "mqtt": "^2.18.8",
     "mysql": "^2.16.0",
     "request": "^2.88.0",
-    "route": "^0.2.5"
+    "route": "^0.2.5",
+    "socket.io": "^2.1.1"
   }
 }
