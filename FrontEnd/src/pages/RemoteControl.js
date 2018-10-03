@@ -1,5 +1,4 @@
 import React from 'react'
-
 import '../css/App.css'
 import '../css/component.css'
 import PlanBtn from '../component/PlanBtn'
@@ -10,7 +9,7 @@ export default class RemoteControl extends React.Component{
         return (
             <main>
                 <div id='plan-btn'>
-                    <PlanBtn/>
+                    <PlanBtn />
                 </div>
                 <div className='box2-wrapper'>
                     <div className='box2-50' >

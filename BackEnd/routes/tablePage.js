@@ -80,4 +80,5 @@ router.route('/scheduling_table').get((req,res)=>{
 function sendJSON(res, result, obj){
     res.json(obj)
 }
+
 module.exports=router;

@@ -2,14 +2,19 @@ import React from 'react'
 import {VictoryPie} from 'victory'
 import request from 'superagent'
 
-
 class Donut extends React.Component {
     state={
         data:[]
     }
+
+
+    shouldComponentUpdate(nextProps, nextState){
+        return nextState.data !== this.state.data;
+    }
+
     componentDidMount(){
         request
-            .get('http://localhost:3010/dashboard/lastMonth')
+            .get(global.url+'/dashboard/lastMonth')
             .query({month:this.props.month})
             .end((err,res)=>{
                 if (err) console.log(err);
