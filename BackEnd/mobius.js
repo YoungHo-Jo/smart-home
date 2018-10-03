@@ -34,6 +34,13 @@ module.exports = function(io) {
         try {
           var jsonObj = JSON.parse(msg.toString()) 
 
+          // {plug, toState, after}
+
+          setTimeout(() => {
+            setSwitchState(plugMacMapping[jsonObj.plug], jsonObj.toState)
+            
+          }, after*1000);
+
         } catch(e) {
 
 
