@@ -9,7 +9,6 @@ const ampsCnt = 'Mobius/smart-home/amps/sub-amps'
 var switchValue = {}
 var ampsValue = {}
 
-
 client.on('connect', () => {
   console.log('MQTT Connected')  
 
@@ -21,31 +20,49 @@ client.on('connect', () => {
     }
   })
 
-  client.on('message', (topic, msg) => {
-    try {
-      var obj = JSON.parse(msg)
-      var cnt = obj.pc['m2m:sgn'].sur
-      var con = obj.pc['m2m:sgn'].nev.rep['m2m:cin'].con
-      console.log(cnt)
-      switch(cnt) {
-        // case rssiCnt:
-        // break
-        case switchCnt:
-          if(!con.cmd) {
-            Object.keys(con).forEach(key => {
-              switchValue[plugMacMapping[key]] = con[key]
-            })
-          }
-        break
-        case ampsCnt:
-          Object.keys(con).forEach(key => {
-            ampsValue[plugMacMapping[key]] = con[key]
-          })
-        break
-      }
-    } catch(e) {
-      console.log(e)
+  client.subscribe('/prediction', err => {
+    if(err) {
+      console.log(err)
+    } else {
+      console.log('MQTT Subscription Success')
     }
+  })
+
+  client.on('message', (topic, msg) => {
+    if(topic === '/prediction') {
+      try {
+        var jsonObj = JSON.parse(msg.toString()) 
+
+      } catch(e) {
+
+
+      }
+    } else if(topic === '/oneM2M/req/Mobius/Ssmart-home/json') {
+      try {
+        var obj = JSON.parse(msg)
+        var cnt = obj.pc['m2m:sgn'].sur
+        var con = obj.pc['m2m:sgn'].nev.rep['m2m:cin'].con
+        switch(cnt) {
+          // case rssiCnt:
+          // break
+          case switchCnt:
+            if(!con.cmd) {
+              Object.keys(con).forEach(key => {
+                switchValue[plugMacMapping[key]] = con[key]
+              })
+            }
+          break
+          case ampsCnt:
+            Object.keys(con).forEach(key => {
+              ampsValue[plugMacMapping[key]] = con[key]
+            })
+          break
+        }
+      } catch(e) {
+        console.log(e)
+      }
+    }
+
   })
 })
 
