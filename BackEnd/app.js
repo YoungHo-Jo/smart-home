@@ -1,7 +1,7 @@
 const express= require('express'), http = require('http');
 const app   = express();
 const cors  = require('cors');
-const mqtt = require('mqtt');
+
 
 let table_name='';
 
@@ -53,7 +53,6 @@ app.use('/checkpage',checkPage);
 let tablePage = require('./routes/tablePage');
 app.use('/tablepage',tablePage)
 
-let client=mqtt.connect('mqtt://52.78.33.177')
 
 client.on('connect',()=>{
     console.log('conecete');
@@ -68,6 +67,13 @@ client.on('connect',()=>{
 })
 
 
-app.listen(app.get('port'),()=>{
-    console.log('server starts..')
+var server = require('http').createServer(app)
+var io = require('socket.io')(server)
+io.on('connection', (socket) => {
+    console.log('Socket.io connected')
+    
 })
+
+server.listen(app.get('port'))
+
+var mobius = require('./mobius')(io)
