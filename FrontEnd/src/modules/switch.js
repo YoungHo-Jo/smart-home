@@ -1,7 +1,4 @@
-import request from 'superagent'
-module.exports = {
-  setSwitch: setSwitchState
-}
+import request from 'request'
 
 const plugNameMapping = {
   "Plug 3": "00:0b:57:27:be:c6",
@@ -11,40 +8,48 @@ const plugNameMapping = {
 }
 
 /**
- * Set a switch state of a plug
- * @param plugName
- * The name of the plug, not the MAC Address
- * @param toState
- * The state of wanting to change
- * @param success
- * A callback function called when the request is succeed
- */
-function setSwitchState(plugName, toState, success) {
+   * Set a switch state of a plug
+   * @param plugName
+   * The name of the plug, not the MAC Address
+   * @param toState
+   * The state of wanting to change
+   * @param succeed
+   * A callback function when the request is succeed
+   */
+  function setSwitchState(plugName, toState, succeed) {
+    var header = {
+      'Accept': 'application/json',
+      'X-M2M-RI': '12345',
+      'X-M2M-Origin': 'user',
+      'content-type': 'application/vnd.onem2m-res+json; ty=4',
+      'Content-Type': 'application/vnd.onem2m-res+json; ty=4',
+      'Content-type': 'application/vnd.onem2m-res+json; ty=4'
+    }
 
-  var body = {
-    "m2m:cin": {
-      "con": {
-        "cmd": {
+    var body = {
+      "m2m:cin": {
+        "con": {
+          "cmd": {
 
+          }
         }
       }
     }
-  }
-  body["m2m:cin"]["con"]["cmd"][plugNameMapping[plugName]] = toState 
+    body["m2m:cin"]["con"]["cmd"][plugNameMapping[plugName]] = toState 
 
-  request
-    .post('http://52.78.33.177:7579/Mobius/smart-home/switch')
-    .send(JSON.stringify(body))
-    .set('Accept', 'application/json')
-    .set('X-M2M-RI', '12345')
-    .set('X-M2M-Origin', 'user')
-    .set('content-type', 'application/vnd.onem2m-res+json; ty=4')
-    .set('Content-Type', 'application/vnd.onem2m-res+json; ty=4')
-    .set('Content-type', 'application/vnd.onem2m-res+json; ty=4')
-    .end((err, res) => {
-      if(err) console.log(err)
-      else {
-        success(res)
+    var options = {
+      url: 'http://52.78.33.177:7579/Mobius/smart-home/switch',
+      method: 'POST',
+      headers: header,
+      form: JSON.stringify(body)
+    }
+
+    request(options, (err, res, body) => {
+      if(!err) {
+        succeed(res, body)
+      } else {
+
       }
     })
 }
+export default setSwitchState
