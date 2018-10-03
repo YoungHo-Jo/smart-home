@@ -41,8 +41,9 @@ module.exports = function(io) {
             
           }, after*1000);
 
-        } catch(e) {
+          io.emit('prediction', msg.toString())
 
+        } catch(e) {
 
         }
       } else if(topic === '/oneM2M/req/Mobius/Ssmart-home/json') {
