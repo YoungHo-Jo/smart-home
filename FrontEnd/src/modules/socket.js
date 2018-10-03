@@ -1,12 +1,26 @@
 import io from 'socket-io-client'
 
-const socket = io('http://localhost')
+const socket = io('http://localhost:3000')
 
-socket.on('switch', msg => {
-  console.log(msg)
-})
-
-
-socket.on('amps', msg => {
-  console.log(msg)
-})
+module.exports = {
+  /**
+   * Listener of Switch state from Socket
+   * @param callback
+   * Passing JSON object of given message
+   */
+  onSwitch: function(callback) {
+    socket.on('switch', msg => {
+      callback(JSON.parse(msg))
+    })
+  },
+  /**
+   * Listener of Amps value from Socket
+   * @param callback
+   * Passing JSON object of given message
+   */
+  onAmps: function(callback) {
+    socket.on('amps', msg => {
+      callback(JSON.parse(msg))
+    })
+  }
+}
