@@ -56,7 +56,7 @@ noble.on('discover', (peripheral) => {
 
           // TODO: problem of discovering forever ... 
           if (err) {
-            console.log(`${CENTRAL} Error Ocurred during Discovering All Services and Characteristics in ${peripheral.address}`)
+            console.log(`${CENTRAL} Error Ocurred during Discovering All Services and Characteristics in ${peripheral.address} == ${peripheral.advertisement.localName}`)
             throw {
               err,
               type: errTypes.discoverAllServicesAndCharacteristicsError,
@@ -78,7 +78,7 @@ noble.on('discover', (peripheral) => {
                   characteristicsOfPeripherals.rssi = characteristic  
                   characteristic.subscribe((err) => {
                     if (err) {
-                      console.log(`${CENTRAL} Error Ocurred during Subscribing ${characteristic.uuid} on ${peripheral.address}`)
+                      console.log(`${CENTRAL} Error Ocurred during Subscribing ${characteristic.uuid} on ${peripheral.address} == ${peripheral.advertisement.localName}`)
                       throw {
                         err,
                         type: errTypes.subscribingError,
@@ -87,7 +87,7 @@ noble.on('discover', (peripheral) => {
                       }
 
                     } else {
-                      console.log(`${CENTRAL} Successfully Subscribing ${characteristic.uuid} on ${peripheral.address}`)
+                      console.log(`${CENTRAL} Successfully Subscribing ${characteristic.uuid} on ${peripheral.address} == ${peripheral.advertisement.localName}`)
 
                       characteristic.on('data', (data, isNotification) => {
 
@@ -101,19 +101,22 @@ noble.on('discover', (peripheral) => {
                         } 
                         
                         if(RSSIs[peripheral.address][MAC_RSSI[0]] == undefined) {
-                          var obj = {}
-                          obj[MAC_RSSI[0]] = {
-                            avg: 0,
-                            arr: [
-                              parseInt(MAC_RSSI[1])
-                            ]
+                          if(MAC_RSSI[0] === '30:ae:a4:01:bf:a2') {
+                            var obj = {}
+                            obj[MAC_RSSI[0]] = {
+                              avg: 0,
+                              arr: [
+                                parseInt(MAC_RSSI[1])
+                              ]
+                            }
+                            var newObj = Object.assign(RSSIs[peripheral.address], obj)
+                            RSSIs[peripheral.address] = newObj
                           }
-                          var newObj = Object.assign(RSSIs[peripheral.address], obj)
-                          RSSIs[peripheral.address] = newObj
                         } else {
-                          var avg = addRssi(peripheral.address, MAC_RSSI[0], parseInt(MAC_RSSI[1]))
-                          if(MAC_RSSI[0] === '30:ae:a4:01:bf:a2') console.log('avg: ', avg)
-                          RSSIs[peripheral.address][MAC_RSSI[0]].avg = avg
+                          if(MAC_RSSI[0] === '30:ae:a4:01:bf:a2') {
+                            var avg = addRssi(peripheral.address, MAC_RSSI[0], parseInt(MAC_RSSI[1]))
+                            RSSIs[peripheral.address][MAC_RSSI[0]].avg = avg
+                          }
                         }
                         // var obj = {}
                         // obj[MAC_RSSI[0]] = MAC_RSSI[1]
@@ -140,14 +143,15 @@ noble.on('discover', (peripheral) => {
                       }
 
                     } else {
-                      console.log(`${CENTRAL} Successfully Subscribing ${characteristic.uuid} on ${peripheral.address}`)
+                      console.log(`${CENTRAL} Successfully Subscribing ${characteristic.uuid} on ${peripheral.address} == ${peripheral.advertisement.localName}`)
 
                       characteristic.on('data', (data, isNotification) => {
 
                         var dummyObj = {}
-                        dummyObj[peripheral.address] = data.toString()
+                        dummyObj[peripheral.address] = data.readUInt16LE()
                         var newCurrentValues = Object.assign(currentValues, dummyObj)
                         currentValues = newCurrentValues 
+                        updateConnectedPeripheral(peripheral, characteristicsOfPeripherals)
                       })
                     }
                   })
@@ -169,14 +173,15 @@ noble.on('discover', (peripheral) => {
                       }
 
                     } else {
-                      console.log(`${CENTRAL} Successfully Subscribing ${characteristic.uuid} on ${peripheral.address}`)
+                      console.log(`${CENTRAL} Successfully Subscribing ${characteristic.uuid} on ${peripheral.address} == ${peripheral.advertisement.localName}`)
 
                       characteristic.on('data', (data, isNotification) => {
 
                         var dummyObj = {}
-                        dummyObj[peripheral.address] = (data[0] == 1) ? true : false
+                        dummyObj[peripheral.address] = (data[0] == 1) ? false : true
                         var newSwitchStates = Object.assign(switchStates, dummyObj)
                         switchStates = newSwitchStates
+                        updateConnectedPeripheral(peripheral, characteristicsOfPeripherals)
                       })
                     }
                   })
@@ -230,7 +235,7 @@ function updateConnectedPeripheral(peripheral, characteristicsOfPeripherals) {
   dummyObj[peripheral.address] = {
     peripheral: peripheral,
     characteristics: characteristicsOfPeripherals,
-    name: peripheral.advertisement.localName
+    name: peripheral.advertisement.localName != undefined ? peripheral.advertisement.localName.toString() : 'undefined'
   }
   var newConnectedPeripherals = Object.assign(connectedPeripherals, dummyObj)            
   connectedPeripherals = newConnectedPeripherals
@@ -239,7 +244,7 @@ function updateConnectedPeripheral(peripheral, characteristicsOfPeripherals) {
 function setSwitch(peripheralAddress, state) {
   var peripheral = connectedPeripherals[peripheralAddress]
   if(peripheral) {
-    connectedPeripherals[peripheralAddress].characteristics.switch.write(Buffer.from([state ? 0x01 : 0x00], false, (err) => {
+    connectedPeripherals[peripheralAddress].characteristics.switch.write(Buffer.from([state ? 0x00 : 0x01], false, (err) => {
       if (err) {
         console.log(`Error Ocurred during Writing to ${connectedPeripheral.switch}`)
         console.log(err)
@@ -262,14 +267,17 @@ module.exports = {
 }
 
 setInterval(() => {
-  // console.log(`RSSIs: `)
-  // console.log(RSSIs)
-  // console.log(`Current Values: `)
-  // console.log(currentValues)
-  // console.log(`Switch States: `)
-  // console.log(switchStates)
+  console.log(`RSSIs: `)
+  console.log(RSSIs)
+  console.log(`Current Values: `)
+  console.log(currentValues)
+  console.log(`Switch States: `)
+  console.log(switchStates)
+  console.log('Plugs: ')
+  Object.keys(connectedPeripherals).forEach(key => {
+    console.log(key + ' ' + connectedPeripherals[key].name)
+  })
   // console.log(Object.keys(connectedPeripherals))
-
 }, 500)
 
 // setInterval(() => {
@@ -314,7 +322,7 @@ function getMedian(plug, mac, ratio = 1) {
   return (avg/RSSIs[plug][mac].arr.length).toFixed(2)
 }
 
-function addRssi(plug, mac, value, size = 60, cutRatio = 1) {
+function addRssi(plug, mac, value, size = 60, cutRatio = 1/60) {
   var median = -1
 
   RSSIs[plug][mac].arr.push(value)

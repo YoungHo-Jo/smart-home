@@ -209,7 +209,10 @@ function uploadPlugs() {
 			if(e.ctname === 'plug') {
 				var plugsAndName = {}
 				Object.keys(ble.connectedPeripherals).forEach(key => {
-					if(!plugsAndName[key]) plugsAndName[key] = ble.connectedPeripherals[key].name
+					var tmp = {}
+					tmp[key] = ble.connectedPeripherals[key].name
+					var newObj = Object.assign(plugsAndName, tmp)
+					plugsAndName = newObj 		
 				})
 				var cin = {
 					ctname: e.ctname,
@@ -231,9 +234,20 @@ function uploadRSSIs() {
 	if(tas_state === 'upload') {
 		upload_arr.every((e, idx) => {
 			if(e.ctname == 'rssi') {
+
+					var plugsAndRssi = {}
+					Object.keys(ble.RSSIs).forEach(key => {
+						var tmp = {}
+						if(ble.RSSIs[key]['30:ae:a4:01:bf:a2'].avg) {
+							tmp[key] = ble.RSSIs[key]['30:ae:a4:01:bf:a2'].avg
+						}
+						var newObj = Object.assign(plugsAndRssi, tmp)
+						plugsAndRssi = newObj 		
+					})
+
 					var cin = {
 						ctname: e.ctname,
-						con: ble.RSSIs
+						con: plugsAndRssi
 					}	
 
 					// console.log(`SEND: ${JSON.stringify(cin)} ---->`)
