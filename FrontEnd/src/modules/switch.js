@@ -33,7 +33,7 @@ function setSwitchState(plugName, toState, success) {
   body["m2m:cin"]["con"]["cmd"][plugNameMapping[plugName]] = toState 
 
   request
-    .protocols('http://52.78.33.177:7579/Mobius/smart-home/switch')
+    .post('http://52.78.33.177:7579/Mobius/smart-home/switch')
     .send(JSON.stringify(body))
     .set('Accept', 'application/json')
     .set('X-M2M-RI', '12345')
