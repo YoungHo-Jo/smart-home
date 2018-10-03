@@ -8,9 +8,9 @@ export default class HalfDonut extends React.Component{
         end:0
     }
 
-    componentWillMount(){ // 이게될까?
+    componentWillMount(){
         request
-            .get(this.props.url)
+            .get(global.url+this.props.url)
             .end((err, res) => {
                 if (err) {
                     console.log("Error:", err)

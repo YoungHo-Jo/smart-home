@@ -11,7 +11,7 @@ class ReservedPlug extends Component{
 
     componentDidMount(){
             request
-                .get('http://localhost:3010/tablepage/scheduling_table')
+                .get(global.url+'/tablepage/scheduling_table')
                 .end((err,res)=>{
                     console.log(res);
                     if (err) console.log(err);

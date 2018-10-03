@@ -6,9 +6,14 @@ class Line extends React.Component {
     state={
         data:[],
     }
+
+    shouldComponentUpdate(nextProps, nextState){
+        return nextState.data !== this.state.data;
+    }
+
     componentDidMount() {
         request
-            .get('http://localhost:3010/dashboard/line')
+            .get(global.url+'/dashboard/line')
             .end((err, res) => {
                 if (err) console.log(err);
                 this.setState({data:res.body});

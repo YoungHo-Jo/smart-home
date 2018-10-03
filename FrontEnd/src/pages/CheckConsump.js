@@ -43,7 +43,7 @@ export default class CheckConsump extends React.Component{
     onCheck=(e)=>{
         console.log(this.state.start , this.state.end)
         request
-            .get('http://localhost:3010/checkpage/date_record')
+            .get(global.url+'/checkpage/date_record')
             .query({
                 start:this.state.start,
                 end:this.state.end

@@ -8,6 +8,11 @@ export default class Bar extends React.Component {
         super(props)
     }
 
+
+    shouldComponentUpdate(nextProps, nextState){
+        return nextProps.data !== this.props.data;
+    }
+
     render() {
         return (
             <VictoryChart
