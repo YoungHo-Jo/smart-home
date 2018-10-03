@@ -12,12 +12,11 @@ export default class Bar extends React.Component {
         return (
             <VictoryChart
                 theme={VictoryTheme.material}
-                domainPadding={10}
+                domainPadding={50}
                 scale={{x:"linear", y:"linear"}}
                 width={600}
                 height={250}
             >
-
                 <VictoryAxis
                     style={{
                         axis: {stroke: "#756f6a"},
@@ -25,7 +24,6 @@ export default class Bar extends React.Component {
                         tickLabels: {fontSize: 10, padding: 5}
                     }}
                 />
-
                 <VictoryAxis
                     dependentAxis
                     style={{
@@ -40,9 +38,12 @@ export default class Bar extends React.Component {
                     style={{
                         parent: {border: "1px solid #ccc"}
                         ,data: {opacity:0.5, fill:"yellow", stroke:"gray", strokeWidth:1 }}}
+                    categories={{
+                        x:["plug1","plug2","plug3","plug4",]
+                    }}
                     data={this.props.data}
-                    x="name"
-                    y="comsump"
+                    x="x"
+                    y="y"
                     width={100}
                     containerComponent={<VictoryContainer responsive={false}/>}/>
 

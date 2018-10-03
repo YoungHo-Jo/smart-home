@@ -27,7 +27,7 @@ export default class CheckConsump extends React.Component{
         selectRange: true,
         start:`${now.getFullYear()}-${now.getMonth()+1}-${now.getDate()}`,
         end:`${now.getFullYear()}-${now.getMonth()+1}-${now.getDate()}`,
-        bardata:[]
+        bardata:[],
     }
 
     onChange = (value) => {
@@ -43,7 +43,7 @@ export default class CheckConsump extends React.Component{
     onCheck=(e)=>{
         console.log(this.state.start , this.state.end)
         request
-            .get('')
+            .get('http://localhost:3010/checkpage/date_record')
             .query({
                 start:this.state.start,
                 end:this.state.end
@@ -52,11 +52,9 @@ export default class CheckConsump extends React.Component{
                 if(err) alert('error')
                 console.log(res.text)
                 let result=JSON.parse(res.text)
-                this.setState({
-                    bardata: result
-                })
+                console.log(result)
+                this.setState({bardata:result})
             })
-
     }
 
     onSetDate = (value)=>{
@@ -94,15 +92,15 @@ export default class CheckConsump extends React.Component{
                 </div>
                 <div className='box3-wrapper'>
                     <div className='box3'>
-                        <div>Compare To</div>
-                        <HalfDonut angle={90} width={500}/>
+                        <div>TTT</div>
+                        <HalfDonut angle={90} width={800}/>
                     </div>
                     <div className='box3'>
-                        <CheckTable />
+                        <CheckTable data={this.state.bardata}/>
                     </div>
                     <div className='box3'>
-                        <div>Last Month</div>
-                        <HalfDonut angle={140} width={500}/>
+                        <div>TTT</div>
+                        <HalfDonut angle={90} width={800}/>
                     </div>
                 </div>
             </main>

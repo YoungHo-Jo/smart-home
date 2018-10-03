@@ -9,7 +9,7 @@ class Donut extends React.Component {
     }
     componentDidMount(){
         request
-            .get('http://localhost:3001/lastMonth')
+            .get('http://localhost:3010/dashboard/lastMonth')
             .query({month:this.props.month})
             .end((err,res)=>{
                 if (err) console.log(err);
