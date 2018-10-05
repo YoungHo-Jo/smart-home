@@ -1,0 +1,9 @@
+plug1,00:0b:57:27:be:57
+plug2,00:0b:57:27:be:c6
+plug3,00:0b:57:27:c0:7f
+plug4,00:0b:57:27:c0:93
+totalSize,266
+trainSize,266
+batchSize,2
+features,8
+timesteps,10
